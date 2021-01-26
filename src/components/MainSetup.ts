@@ -1,4 +1,4 @@
-import { computed, nextTick, ref, unref, watch } from "vue";
+import { computed, defineEmit, nextTick, Ref, ref, unref, watch } from "vue";
 import { TagModel } from "../models";
 import HandlePaste from "./HandlePaste";
 
@@ -15,7 +15,8 @@ interface PropModel {
   quickDelete?: boolean;
 }
 
-export default function ({ autosuggest, allowPaste, allowDuplicates, maxTags, defaultTags = [], sources, quickDelete, width }: PropModel) {
+export default function ({ autosuggest, allowPaste, allowDuplicates, maxTags, defaultTags = [], sources, quickDelete, width }: PropModel, ctx:any) {
+    
   const delTagRef = ref<{ id: string } | null>(null);
   // ref to store the tags data. init with default tags
   const tagsData = ref<TagModel[]>(defaultTags.slice(0, maxTags).map(name => ({
@@ -26,6 +27,9 @@ export default function ({ autosuggest, allowPaste, allowDuplicates, maxTags, de
   const textInputRef = ref(null);
   // ref for the input box
   const input = ref("");
+
+  let arrayData = ref<string[]>(tagsData.value.map(a => a.name));
+
   // ref to track the tags created by te user
   const tagsCreated = ref(defaultTags.length ? Math.min(defaultTags.length, maxTags) : 0);
   // ref to display the suggestion pane
@@ -110,7 +114,7 @@ export default function ({ autosuggest, allowPaste, allowDuplicates, maxTags, de
     }
 
     if (!canAddTag(nameToUse)) {
-      return;
+      return; 
     }
 
     let newTag = null;
@@ -129,6 +133,8 @@ export default function ({ autosuggest, allowPaste, allowDuplicates, maxTags, de
       });
     }
 
+    updateValue();
+
     input.value = "";
     showSuggestions.value = false;
     tagsCreated.value += 1;
@@ -141,6 +147,7 @@ export default function ({ autosuggest, allowPaste, allowDuplicates, maxTags, de
   const handleRemoveTag = (id: string) => {
     tagsData.value = tagsData.value.filter((t) => t.id !== id);
     tagsCreated.value -= 1;
+    updateValue();
   };
 
   const handleDelete = () => {
@@ -258,8 +265,14 @@ export default function ({ autosuggest, allowPaste, allowDuplicates, maxTags, de
     }
   };
 
+  const updateValue = () => {
+    arrayData = ref<string[]>(tagsData.value.map(a => a.name));
+    ctx.emit("update:modelValue", arrayData.value);
+  }
+
   return {
     tagsData,
+    arrayData,
     input,
     style,
     textInputRef,
@@ -277,5 +290,6 @@ export default function ({ autosuggest, allowPaste, allowDuplicates, maxTags, de
     handleSuggestSelection,
     handleSuggestEsc,
     handleSelectAll,
+    updateValue
   };
 }
