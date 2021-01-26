@@ -3,6 +3,7 @@
     class="tags-main"
     :style="{background: theme.background}"
     @keyup.ctrl="handleSelectAll"
+    :value="arrayData"
   >
     <Tags
       :tags="tagsData"
@@ -64,6 +65,10 @@ export default defineComponent({
     SuggestionPane,
   },
   props: {
+    modelValue: {
+      type: Array as PropType<string[]>,
+      default: () => [],
+    },
     readOnly: {
       type: Boolean,
       default: false,
