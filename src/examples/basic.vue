@@ -8,7 +8,8 @@
       <code class="lang-html">{{ code }}</code>
     </pre>
     <div class="sample-view">
-      <smart-tagz input-placeholder="Select Countries ..." />
+      <smart-tagz v-model="content" input-placeholder="Select Countries ..." />
+      {{content}}
     </div>
   </div>
 </template>
@@ -26,6 +27,7 @@ export default defineComponent({
   },
   data() {
     return {
+      content: [],
       code: '<smart-tagz input-placeholder="Select Countries ..." />',
     };
   },
